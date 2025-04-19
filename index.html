@@ -4,27 +4,299 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DPS Simulator</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .ability-container {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+        }
+        .ability {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            background-color: #4a90e2;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.1s, box-shadow 0.1s;
+            user-select: none;
+        }
+        .ability:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        .ability:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .ability.cooling {
+            cursor: not-allowed;
+        }
+        .ability.gcd {
+            cursor: not-allowed;
+            background-color: #5a9ae0;
+        }
+        .cooldown-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            font-size: 14px;
+            display: flex;
+            justify-content: center;
+            padding: 2px 0;
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+        .cooldown-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 100%, 0 100%, 0 0, 50% 0);
+            transform-origin: center;
+            animation: cooldown-fill 1s linear forwards;
+        }
+        .gcd-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 0, 0, 0.3);
+            border-radius: 8px;
+            clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 100%, 0 100%, 0 0, 50% 0);
+            transform-origin: center;
+            animation: cooldown-fill 1.5s linear forwards;
+        }
+        @keyframes cooldown-fill {
+            0% {
+                clip-path: polygon(50% 50%, 50% 0, 50% 0, 50% 0, 50% 0, 50% 0, 50% 0);
+            }
+            12.5% {
+                clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 0, 100% 0, 100% 0, 100% 0);
+            }
+            25% {
+                clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 100%, 100% 100%, 100% 100%, 100% 100%);
+            }
+            37.5% {
+                clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 100%, 50% 100%, 50% 100%, 50% 100%);
+            }
+            50% {
+                clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 100%, 0 100%, 0 100%, 0 100%);
+            }
+            62.5% {
+                clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 100%, 0 100%, 0 50%, 0 50%);
+            }
+            75% {
+                clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 100%, 0 100%, 0 0, 0 0);
+            }
+            87.5% {
+                clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 100%, 0 100%, 0 0, 25% 0);
+            }
+            100% {
+                clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 100%, 0 100%, 0 0, 50% 0);
+            }
+        }
+        .stats-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .damage-log {
+            height: 200px;
+            overflow-y: auto;
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+        .total-damage {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+        .gcd-text {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #555;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <h1>DPS Simulator</h1>
-        <div class="buttons">
-            <button class="skill-btn" id="skill1">Skill 1</button>
-            <button class="skill-btn" id="skill2">Skill 2</button>
-            <button class="skill-btn" id="skill3">Skill 3</button>
-            <button class="skill-btn" id="skill4">Skill 4</button>
+    <h1>DPS Simulator</h1>
+    
+    <div class="ability-container">
+        <div class="ability" id="ability1" data-cooldown="3" data-damage="100">
+            1
+            <div class="cooldown-overlay" style="display: none;">0s</div>
         </div>
-        <p>Global Cooldown: <input type="number" id="globalCooldown" value="1" min="0" step="0.1"> seconds</p>
-        <div class="log">
-            <h2>Damage Log:</h2>
-            <ul id="damageLog"></ul>
+        <div class="ability" id="ability2" data-cooldown="5" data-damage="250">
+            2
+            <div class="cooldown-overlay" style="display: none;">0s</div>
         </div>
-        <div class="total-dps">
-            <h2>Total DPS: <span id="totalDps">0</span></h2>
+        <div class="ability" id="ability3" data-cooldown="8" data-damage="500">
+            3
+            <div class="cooldown-overlay" style="display: none;">0s</div>
+        </div>
+        <div class="ability" id="ability4" data-cooldown="12" data-damage="1000">
+            4
+            <div class="cooldown-overlay" style="display: none;">0s</div>
         </div>
     </div>
+    
+    <div class="stats-container">
+        <div class="total-damage">Total Damage: <span id="total-damage">0</span></div>
+        <div class="gcd-text">Global Cooldown: <span id="gcd-status">Ready</span></div>
+        <h3>Damage Log:</h3>
+        <div class="damage-log" id="damage-log"></div>
+    </div>
 
-    <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const abilities = document.querySelectorAll('.ability');
+            let totalDamage = 0;
+            const totalDamageDisplay = document.getElementById('total-damage');
+            const damageLog = document.getElementById('damage-log');
+            const gcdStatus = document.getElementById('gcd-status');
+            
+            const globalCooldown = 1.5; // 1.5 second GCD
+            let isGCDActive = false;
+            
+            abilities.forEach(ability => {
+                ability.addEventListener('click', () => {
+                    // Don't do anything if this ability is on cooldown
+                    if (ability.classList.contains('cooling')) {
+                        return;
+                    }
+                    
+                    // Don't do anything if global cooldown is active
+                    if (isGCDActive) {
+                        return;
+                    }
+                    
+                    const damage = parseInt(ability.dataset.damage);
+                    const cooldown = parseInt(ability.dataset.cooldown);
+                    const abilityName = ability.id;
+                    
+                    // Add damage to total
+                    totalDamage += damage;
+                    totalDamageDisplay.textContent = totalDamage;
+                    
+                    // Log damage
+                    const timestamp = new Date().toLocaleTimeString();
+                    const logEntry = document.createElement('div');
+                    logEntry.classList.add('log-entry');
+                    logEntry.textContent = `[${timestamp}] ${abilityName}: ${damage} damage`;
+                    damageLog.appendChild(logEntry);
+                    damageLog.scrollTop = damageLog.scrollHeight;
+                    
+                    // Start ability-specific cooldown
+                    ability.classList.add('cooling');
+                    
+                    // Create cooldown animation
+                    const cooldownAnimation = document.createElement('div');
+                    cooldownAnimation.classList.add('cooldown-animation');
+                    cooldownAnimation.style.animation = `cooldown-fill ${cooldown}s linear forwards`;
+                    ability.appendChild(cooldownAnimation);
+                    
+                    // Show and update cooldown timer
+                    const cooldownOverlay = ability.querySelector('.cooldown-overlay');
+                    cooldownOverlay.style.display = 'flex';
+                    
+                    let timeLeft = cooldown;
+                    cooldownOverlay.textContent = `${timeLeft}s`;
+                    
+                    const timer = setInterval(() => {
+                        timeLeft -= 1;
+                        cooldownOverlay.textContent = `${timeLeft}s`;
+                        
+                        if (timeLeft <= 0) {
+                            clearInterval(timer);
+                            ability.classList.remove('cooling');
+                            cooldownOverlay.style.display = 'none';
+                            if (cooldownAnimation && cooldownAnimation.parentNode === ability) {
+                                ability.removeChild(cooldownAnimation);
+                            }
+                        }
+                    }, 1000);
+                    
+                    // Start global cooldown (GCD)
+                    startGlobalCooldown();
+                });
+            });
+            
+            function startGlobalCooldown() {
+                // Set GCD flag
+                isGCDActive = true;
+                gcdStatus.textContent = `${globalCooldown}s`;
+                
+                // Add GCD class to all abilities
+                abilities.forEach(ability => {
+                    ability.classList.add('gcd');
+                    
+                    // Create GCD animation
+                    const gcdAnimation = document.createElement('div');
+                    gcdAnimation.classList.add('gcd-animation');
+                    ability.appendChild(gcdAnimation);
+                });
+                
+                // GCD timer
+                let gcdTimeLeft = globalCooldown;
+                const gcdTimer = setInterval(() => {
+                    gcdTimeLeft -= 0.1;
+                    gcdStatus.textContent = `${gcdTimeLeft.toFixed(1)}s`;
+                    
+                    if (gcdTimeLeft <= 0) {
+                        clearInterval(gcdTimer);
+                        isGCDActive = false;
+                        gcdStatus.textContent = 'Ready';
+                        
+                        // Remove GCD class and animation from all abilities
+                        abilities.forEach(ability => {
+                            ability.classList.remove('gcd');
+                            const gcdAnim = ability.querySelector('.gcd-animation');
+                            if (gcdAnim && gcdAnim.parentNode === ability) {
+                                ability.removeChild(gcdAnim);
+                            }
+                        });
+                    }
+                }, 100);
+            }
+        });
+    </script>
 </body>
 </html>
