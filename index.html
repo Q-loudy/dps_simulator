@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DPS Simulator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>DPS Simulator</h1>
+        <div class="buttons">
+            <button class="skill-btn" id="skill1">Skill 1</button>
+            <button class="skill-btn" id="skill2">Skill 2</button>
+            <button class="skill-btn" id="skill3">Skill 3</button>
+            <button class="skill-btn" id="skill4">Skill 4</button>
+        </div>
+        <p>Global Cooldown: <input type="number" id="globalCooldown" value="1" min="0" step="0.1"> seconds</p>
+        <div class="log">
+            <h2>Damage Log:</h2>
+            <ul id="damageLog"></ul>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
