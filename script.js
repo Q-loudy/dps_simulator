@@ -23,13 +23,20 @@ const handleSkillClick = (skillId, damage) => {
         // Update the Total DPS
         document.getElementById('totalDps').textContent = totalDamage;
 
-        // Disable the button and re-enable after cooldown
+        // Disable the button and start the cooldown animation
         const button = document.getElementById(skillId);
-        button.disabled = true;
+        const cooldownProgress = document.createElement('div');
+        cooldownProgress.classList.add('cooldown-progress');
+        button.appendChild(cooldownProgress);
 
+        button.disabled = true;
         lastUsed[skillId] = now;
+
+        // Animation to show cooldown progress
+        cooldownProgress.style.transform = `scaleX(1)`; // Start the scale animation
         setTimeout(() => {
             button.disabled = false;
+            button.removeChild(cooldownProgress); // Remove the progress bar after cooldown
         }, globalCooldown * 1000);
     } else {
         alert(`${skillId} is on cooldown!`);
