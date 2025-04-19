@@ -1,5 +1,0 @@
-# Disable Jekyll processing
-skip:
-  - "*.scss"
-  - "*.sass"
-  - "*.scss.liquid"
