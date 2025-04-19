@@ -1,5 +1,6 @@
 let globalCooldown = 1; // Default global cooldown (in seconds)
-let lastUsed = {};
+let lastUsed = {}; // To track the last time each skill was used
+let totalDamage = 0; // Running total for damage dealt
 
 // Function to update global cooldown
 document.getElementById('globalCooldown').addEventListener('input', (event) => {
@@ -12,10 +13,15 @@ const handleSkillClick = (skillId, damage) => {
 
     // Check if the skill is off cooldown
     if (!lastUsed[skillId] || now - lastUsed[skillId] >= globalCooldown * 1000) {
-        // Log damage
+        // Log the damage and update the total
+        totalDamage += damage;
+
         const logEntry = document.createElement('li');
         logEntry.textContent = `Used ${skillId} for ${damage} damage`;
         document.getElementById('damageLog').appendChild(logEntry);
+
+        // Update the Total DPS
+        document.getElementById('totalDps').textContent = totalDamage;
 
         // Disable the button and re-enable after cooldown
         const button = document.getElementById(skillId);
