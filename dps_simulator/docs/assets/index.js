@@ -1,0 +1,1 @@
+// Simulated JS output from Vite build
