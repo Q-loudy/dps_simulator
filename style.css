@@ -1,82 +1,214 @@
 body {
     font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: #f4f4f9;
-}
-
-.container {
-    text-align: center;
-    max-width: 600px;
-    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f0f0f0;
 }
 
 h1 {
+    text-align: center;
     color: #333;
 }
 
-.buttons {
-    margin: 20px 0;
+.ability-container {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 30px;
 }
 
-.skill-btn {
+.ability {
     position: relative;
-    padding: 15px 30px;
-    margin: 10px;
-    font-size: 16px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 25px;
+    width: 80px;
+    height: 80px;
+    background-color: #4a90e2;
+    border-radius: 8px;
     cursor: pointer;
-    transition: background-color 0.3s;
-    overflow: hidden; /* To hide progress bar outside button */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.1s, box-shadow 0.1s;
+    user-select: none;
 }
 
-.skill-btn:disabled {
-    background-color: #ddd;
+.ability:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.ability:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.ability.cooling {
     cursor: not-allowed;
 }
 
-.skill-btn .cooldown-progress {
+.ability.gcd {
+    cursor: not-allowed;
+    background-color: #5a9ae0;
+}
+
+.cooldown-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    padding: 2px 0;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+}
+
+.cooldown-animation {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(255, 255, 255, 0.6); /* Light overlay */
-    transform-origin: 50% 50%;
-    transform: scaleX(0);
+    background-color: rgba(0, 0, 0, 0.5);
+    border-radius: 8px;
+    clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 100%, 0 100%, 0 0, 50% 0);
     transform-origin: center;
-    transition: transform 1s linear;
+    animation: cooldown-fill 1s linear forwards;
 }
 
-input[type="number"] {
-    width: 80px;
+.gcd-animation {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 0, 0, 0.3);
+    border-radius: 8px;
+    clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 100%, 0 100%, 0 0, 50% 0);
+    transform-origin: center;
+    animation: cooldown-fill 1.5s linear forwards;
+}
+
+.hotkey-indicator {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border-radius: 3px;
+    padding: 1px 4px;
+    font-size: 10px;
+}
+
+@keyframes cooldown-fill {
+    0% {
+        clip-path: polygon(50% 50%, 50% 0, 50% 0, 50% 0, 50% 0, 50% 0, 50% 0);
+    }
+    12.5% {
+        clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 0, 100% 0, 100% 0, 100% 0);
+    }
+    25% {
+        clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 100%, 100% 100%, 100% 100%, 100% 100%);
+    }
+    37.5% {
+        clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 100%, 50% 100%, 50% 100%, 50% 100%);
+    }
+    50% {
+        clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 100%, 0 100%, 0 100%, 0 100%);
+    }
+    62.5% {
+        clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 100%, 0 100%, 0 50%, 0 50%);
+    }
+    75% {
+        clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 100%, 0 100%, 0 0, 0 0);
+    }
+    87.5% {
+        clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 100%, 0 100%, 0 0, 25% 0);
+    }
+    100% {
+        clip-path: polygon(50% 50%, 50% 0, 100% 0, 100% 100%, 0 100%, 0 0, 50% 0);
+    }
+}
+
+.stats-container {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.damage-log {
+    height: 200px;
+    overflow-y: auto;
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+}
+
+.log-entry {
+    margin-bottom: 5px;
     padding: 5px;
-    font-size: 16px;
+    border-bottom: 1px solid #eee;
 }
 
-.log {
-    margin-top: 20px;
-    text-align: left;
+.log-entry:last-child {
+    border-bottom: none;
 }
 
-.log ul {
-    list-style-type: none;
-    padding-left: 0;
-}
-
-.total-dps {
-    margin-top: 20px;
+.total-damage, .timer, .dps-display {
     font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.gcd-text {
+    font-size: 16px;
+    margin-bottom: 20px;
+    color: #555;
+}
+
+.hotkeys-help {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    border-left: 4px solid #4a90e2;
+}
+
+.hotkeys-help ul {
+    margin: 5px 0 0 0;
+    padding-left: 20px;
+}
+
+.control-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.control-buttons button {
+    padding: 8px 12px;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
     font-weight: bold;
 }
 
-button:hover {
-    background-color: #45a049;
+.control-buttons button:hover {
+    background-color: #3a80d2;
+}
+
+.control-buttons button:active {
+    background-color: #2a70c2;
 }
